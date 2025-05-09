@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engineer Capability Search</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-image: url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=2070&auto=format&fit=crop');
+            background-color: #111827; /* Fallback dark background color if image fails */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative; /* For the overlay and content stacking */
+        }
+
+        body::before { /* Overlay for better text contrast on top of the image */
+            content: "";
+            position: fixed; /* Fixed overlay to cover the viewport */
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(17, 24, 39, 0.65); /* Semi-transparent dark overlay */
+            z-index: 0; /* Sits on top of body's background, but below actual content */
+        }
+
+        /* Styles for select and scrollbar remain unchanged */
+        select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23CBD5E0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+            background-repeat: no-repeat;
+            background-position: right .7em top 50%;
+            background-size: .65em auto;
+            padding-right: 2.5em;
+        }
+
+        #resultsList::-webkit-scrollbar {
+            width: 8px;
+        }
+        #resultsList::-webkit-scrollbar-track {
+            background: #374151; /* Tailwind gray-700 */
+        }
+        #resultsList::-webkit-scrollbar-thumb {
+            background-color: #6b7280; /* Tailwind gray-500 */
+            border-radius: 4px;
+            border: 2px solid #374151; /* Tailwind gray-700 */
+        }
+
+        .content-wrapper { /* New wrapper for button and main card */
+            position: relative; /* To stack above the ::before pseudo-element */
+            z-index: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1.5rem; /* p-6 */
+            padding-bottom: 1.5rem; /* p-6 */
+        }
+
+        .main-content-container {
+            /* Existing styles for the main card */
+            /* No z-index needed here directly if its parent (.content-wrapper) handles it */
+        }
+    </style>
+</head>
+<body class="min-h-screen text-gray-100"> <div class="content-wrapper"> <div class="w-full max-w-lg text-left mb-6 px-6 sm:px-0"> <a href="index.html" class="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold py-2 px-4 rounded shadow-md hover:shadow-lg transition duration-150 ease-in-out">
+                &larr; Home
+            </a>
+        </div>
+
+        <div class="main-content-container bg-gray-800 bg-opacity-80 backdrop-blur-md p-8 sm:p-10 rounded-xl shadow-2xl w-full max-w-lg transform transition-all duration-300 hover:scale-[1.01]">
+            <h1 class="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-sky-400 leading-tight tracking-tight">
+                Engineer Capability Search
+            </h1>
+
+            <div class="mb-6">
+                <label for="capabilityDropdown" class="block text-sky-300 text-sm font-semibold mb-2">
+                    Select Capability:
+                </label>
+                <select id="capabilityDropdown"
+                        class="w-full px-4 py-3 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition duration-200 ease-in-out bg-gray-700 text-gray-100 placeholder-gray-400">
+                    <option value="" class="text-gray-400">-- Select a Capability --</option>
+                    </select>
+            </div>
+
+            <div id="results" class="mt-8 border-t border-gray-700 pt-6 hidden">
+                <h2 class="text-2xl font-bold mb-4 text-sky-300 border-b border-gray-600 pb-3">
+                    Engineers with this Capability:
+                </h2>
+                <div id="resultsList" class="space-y-3 max-h-60 overflow-y-auto pr-2">
+                    </div>
+            </div>
+
+            <div id="messageBox" class="mt-6 p-4 rounded-lg shadow-sm hidden" role="alert">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        // Engineer data and JavaScript logic (kept the same)
+        const engineersData = [
+            { name: "Marcos Kauffman", company: "Coventry University", capabilities: ["APQP", "Lean Manufacturing", "Six Sigma", "Digital Twin", "IP", "Design for Manufacturing", "Design", "CAD", "FEA"] },
+            { name: "Tengfei Long", company: "Coventry University", capabilities: ["Design for Manufacturing", "Digital Twin", "CAD", "FEA"] },
+            { name: "Stephen Spooner", company: "Coventry University", capabilities: ["Sustainability", "Net Zero", "Project Management", "Risk Assessment"] },
+            { name: "Lara Harris", company: "Coventry University", capabilities: ["Data", "Digital Twin", "Data Science"] },
+            { name: "Glen Turley", company: "Coventry University", capabilities: ["Metrology", "Design", "Material Science", "Design", "CAD"] },
+            { name: "Shone George", company: "Coventry University", capabilities: ["Six Sigma", "Digital Twin", "Design for Manufacturing", "Design", "CAD"] },
+            { name: "Kathy Zhang", company: "Coventry University", capabilities: ["Sustainability", "Net Zero"] },
+            { name: "Masoud Ahmadinia", company: "Coventry University", capabilities: ["Sustainability", "Net Zero", "Tool maker", "AI", "website buider"] }
+        ];
+
+        const capabilityDropdown = document.getElementById('capabilityDropdown');
+        const resultsDiv = document.getElementById('results');
+        const resultsList = document.getElementById('resultsList');
+        const messageBox = document.getElementById('messageBox');
+
+        function populateCapabilitiesDropdown() {
+            const allCapabilities = new Set();
+            engineersData.forEach(engineer => {
+                engineer.capabilities.forEach(capability => {
+                    if (capability && capability.trim() !== "") {
+                        allCapabilities.add(capability.trim());
+                    }
+                });
+            });
+
+            const sortedCapabilities = Array.from(allCapabilities).sort((a, b) => a.localeCompare(b));
+
+            sortedCapabilities.forEach(capability => {
+                const option = document.createElement('option');
+                option.value = capability;
+                option.textContent = capability;
+                option.classList.add('text-gray-100', 'bg-gray-700'); // Style for dark mode dropdown
+                capabilityDropdown.appendChild(option);
+            });
+        }
+
+        function displayResults(selectedCapability) {
+            resultsList.innerHTML = ''; 
+            resultsDiv.classList.add('hidden');
+            hideMessage();
+
+            if (!selectedCapability) {
+                return;
+            }
+
+            const matchingEngineers = engineersData.filter(engineer =>
+                engineer.capabilities.some(capabilityInList => 
+                    capabilityInList.toLowerCase() === selectedCapability.toLowerCase()
+                )
+            );
+
+            if (matchingEngineers.length > 0) {
+                matchingEngineers.forEach(engineer => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'text-gray-200 bg-gray-700/70 p-3 rounded-md shadow hover:bg-gray-600/80 transition-colors duration-150';
+                    resultItem.innerHTML = `<strong class="text-sky-400">${engineer.name}</strong> <span class="text-gray-400 text-sm">(${engineer.company})</span>`;
+                    resultsList.appendChild(resultItem);
+                });
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.querySelector('h2').textContent = `Engineers with "${selectedCapability}" Capability:`;
+            } else {
+                showMessage(`No engineers found with the capability "${selectedCapability}".`, 'bg-yellow-600 bg-opacity-60 text-yellow-50 border border-yellow-500');
+            }
+        }
+
+        capabilityDropdown.addEventListener('change', () => {
+            const selectedValue = capabilityDropdown.value;
+            if (selectedValue) { 
+                displayResults(selectedValue);
+            } else { 
+                resultsList.innerHTML = '';
+                resultsDiv.classList.add('hidden');
+                hideMessage();
+            }
+        });
+
+        function showMessage(message, className) {
+            messageBox.textContent = message;
+            messageBox.className = `mt-6 p-4 rounded-lg shadow-md ${className}`; 
+            messageBox.classList.remove('hidden'); 
+        }
+
+        function hideMessage() {
+            messageBox.classList.add('hidden'); 
+            messageBox.textContent = ''; 
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            populateCapabilitiesDropdown();
+        });
+    </script>
+</body>
+</html>
